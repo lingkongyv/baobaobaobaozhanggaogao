@@ -1,0 +1,633 @@
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #87ceeb;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  #game {
+    position: fixed;
+    inset: 0;
+    display: block;
+    cursor: grab;
+  }
+  #game.dragging { cursor: grabbing; }
+
+  .hud {
+    position: fixed;
+    top: 16px;
+    left: 50px;   /* 左上角文字往右移一点 */
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .hud .title {
+    font-size: 22px;
+    letter-spacing: 1px;
+  }
+  .hud .stats {
+    margin-top: 6px;
+    font-size: 14px;
+    opacity: 0.95;
+  }
+  .hud .stats span { margin-right: 14px; }
+
+  /* 底部UI容器：老虎机 + 操作提示，整体水平居中于屏幕底部，成员垂直中心对齐 */
+  .bottom-ui {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;   /* 老虎机与提示条中心对齐 */
+    gap: 18px;
+    z-index: 20;
+  }
+
+  /* 操作提示：两行，位于老虎机卡片右侧，随容器自动对齐 */
+  .tip {
+    width: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(255, 61, 127, 0.92), rgba(255, 140, 60, 0.9));
+    padding: 8px 10px;
+    border-radius: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(120, 10, 60, 0.4);
+    box-shadow: 0 6px 22px rgba(255, 61, 127, 0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    pointer-events: none;
+    z-index: 10;
+    animation: tipGlow 1.8s ease-in-out infinite;
+  }
+  @keyframes tipGlow {
+    0%, 100% { box-shadow: 0 6px 18px rgba(255, 61, 127, 0.4), inset 0 1px 0 rgba(255,255,255,0.5); transform: scale(1); }
+    50%      { box-shadow: 0 6px 28px rgba(255, 61, 127, 0.75), inset 0 1px 0 rgba(255,255,255,0.5); transform: scale(1.04); }
+  }
+
+  #weather-banner {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    background: rgba(20, 30, 60, 0.45);
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    pointer-events: none;
+    z-index: 15;
+    opacity: 0;
+    transition: opacity 0.4s;
+    white-space: nowrap;
+  }
+  #weather-banner.show { opacity: 1; }
+
+  #evolve-banner {
+    position: fixed;
+    top: 100px;   /* 进化/地形横幅移到上方（不居中） */
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    background: linear-gradient(135deg, rgba(255, 180, 60, 0.88), rgba(255, 110, 150, 0.88));
+    padding: 12px 26px;
+    border-radius: 999px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 26px rgba(255, 140, 60, 0.5);
+    pointer-events: none;
+    z-index: 26;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.45s, transform 0.45s;
+  }
+  #evolve-banner.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+  #bgm-btn {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 120, 160, 0.85);
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 100, 150, 0.4);
+    transition: transform 0.15s;
+  }
+  #bgm-btn:hover { transform: translateY(-2px); }
+  #bgm-btn:active { transform: translateY(1px); }
+
+  #settings-btn {
+    position: fixed;
+    right: 50px;   /* 设置按钮往左移一点 */
+    top: 18px;
+    z-index: 30;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(40, 60, 100, 0.75);
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s;
+  }
+  #settings-btn:hover { transform: rotate(30deg); }
+
+  #nightmare-btn {
+    position: fixed;
+    right: 48px;   /* 与设置按钮同列 */
+    top: 72px;     /* 紧贴设置按钮正下方 */
+    z-index: 30;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    padding: 6px 12px;
+    background: rgba(60, 40, 80, 0.7);
+    color: #ffd9e6;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
+  }
+  #nightmare-btn:hover { transform: translateY(-2px); }
+  #nightmare-btn:active { transform: translateY(1px); }
+  #nightmare-btn.on {
+    background: linear-gradient(135deg, #ff4d4d, #b3202a);
+    color: #fff;
+    border-color: #ffb3b3;
+    box-shadow: 0 0 16px rgba(255, 60, 60, 0.8), inset 0 1px 0 rgba(255,255,255,0.35);
+    animation: nmPulse 1.2s ease-in-out infinite;
+  }
+  @keyframes nmPulse {
+    0%, 100% { box-shadow: 0 0 12px rgba(255, 60, 60, 0.55), inset 0 1px 0 rgba(255,255,255,0.35); }
+    50%      { box-shadow: 0 0 24px rgba(255, 60, 60, 0.95), inset 0 1px 0 rgba(255,255,255,0.35); }
+  }
+
+  #ach-btn {
+    position: fixed;
+    right: 104px;   /* 成就按钮往左移一点 */
+    top: 18px;
+    z-index: 30;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(210, 150, 40, 0.8);
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s;
+  }
+  #ach-btn:hover { transform: rotate(15deg) scale(1.08); }
+
+  #ach-panel {
+    position: fixed;
+    right: 18px;
+    top: 70px;
+    z-index: 40;   /* 高于右上角按钮（设置/噩梦），打开时遮住它们 */
+    width: 250px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: rgba(30, 40, 70, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #fff;
+    display: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+  #ach-panel .panel-title { display:flex; align-items:center; justify-content:space-between; font-size:15px; font-weight:700; letter-spacing:2px; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.15); padding:6px 2px 8px; }
+  .ach-act { display:flex; align-items:center; gap:8px; }
+  #ach-close { cursor:pointer; font-size:13px; opacity:0.8; padding:2px 4px; }
+  #ach-close:hover { opacity:1; }
+  #ach-clear { cursor:pointer; font-size:11px; color:#ff9aa0; border:1px solid rgba(255, 154, 160, 0.5); border-radius:8px; padding:1px 8px; }
+  #ach-clear:hover { background: rgba(255, 154, 160, 0.18); color: #ffb9bd; }
+  .ach-row { display: flex; align-items: center; gap: 8px; padding: 7px 4px; border-radius: 8px; opacity: 0.45; }
+  .ach-row.done { opacity: 1; background: rgba(255, 200, 90, 0.12); }
+  .ach-icon { font-size: 20px; flex: 0 0 26px; text-align: center; }
+  .ach-info { flex: 1; }
+  .ach-name { font-size: 13px; font-weight: 700; color: #ffd97a; }
+  .ach-row:not(.done) .ach-name { color: #aab4cc; }
+  .ach-date { font-size: 11px; color: #ffb44c; font-weight: 400; }
+  .ach-desc { font-size: 11px; color: #c8d2e8; }
+  .ach-check { flex: 0 0 20px; text-align: center; font-weight: 800; font-size: 14px; }
+  .ach-row.done .ach-check { color: #5ee27e; }
+
+  #ach-banner {
+    position: fixed;
+    top: 160px;   /* 弹窗放上方（天气横幅 70px 之下），不再居中 */
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    background: linear-gradient(135deg, rgba(255, 190, 80, 0.9), rgba(255, 130, 90, 0.9));
+    padding: 11px 22px;
+    border-radius: 999px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 8px 26px rgba(255, 160, 70, 0.5);
+    pointer-events: none;
+    z-index: 27;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.45s, transform 0.45s;
+  }
+  #ach-banner.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+  #settings-panel {
+    position: fixed;
+    right: 18px;
+    top: 70px;
+    z-index: 30;
+    width: 220px;
+    background: rgba(30, 40, 70, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #fff;
+    display: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+  #settings-panel.open { display: block; }
+  #settings-panel .panel-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding-bottom: 8px;
+  }
+  #settings-panel .set-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 2px;
+    font-size: 13px;
+  }
+  #settings-panel .set-row .full { width: 100%; }
+  #settings-panel .s-btn {
+    min-width: 56px;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #settings-panel .s-btn:hover { background: rgba(255, 255, 255, 0.28); }
+  #settings-panel .s-btn.danger { background: rgba(255, 80, 90, 0.4); }
+  #settings-panel .s-btn.danger:hover { background: rgba(255, 80, 90, 0.6); }
+  #settings-panel .row-btn {
+    width: 100%;
+    margin-top: 6px;
+  }
+  #settings-panel input[type="range"] {
+    width: 100px;
+    accent-color: #ff8db5;
+  }
+
+  #pause-msg {
+    position: fixed;
+    top: 42%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 44px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    letter-spacing: 6px;
+    pointer-events: none;
+    z-index: 25;
+    display: none;
+  }
+
+  /* === 老虎机（横版：三个转轮横向排列，位于底部UI容器内） === */
+  #slot-machine {
+    background: linear-gradient(180deg, #fff5fb 0%, #ffe0ec 100%);
+    border: 3px solid #ff8db5;
+    border-radius: 20px;
+    padding: 12px 14px 10px;
+    z-index: 20;
+    box-shadow: 0 8px 24px rgba(255, 100, 150, 0.3), inset 0 2px 0 rgba(255,255,255,0.6);
+    text-align: center;
+    width: 400px;
+    user-select: none;
+  }
+  .slot-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  /* 按钮跟随转轮放在同一行右侧 */
+  .slot-row #slot-pull {
+    width: auto;
+    min-width: 108px;
+    padding: 10px 14px;
+    flex: none;
+  }
+  .slot-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #d43a6a;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .slot-frame {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 0;   /* 行内垂直居中，下间距由 .slot-row 控制 */
+    background: linear-gradient(180deg, #fff 0%, #f8e8ee 100%);
+    border: 2px solid #ff8db5;
+    border-radius: 10px;
+    padding: 6px;
+  }
+  .reel {
+    background: #fff;
+    border: 2px solid #ffc4d6;
+    border-radius: 6px;
+    font-size: 24px;
+    font-weight: 700;
+    width: 42px;
+    height: 38px;
+    line-height: 34px;
+    text-align: center;
+    color: #4a90e2;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .reel.spinning {
+    background: #fff5fb;
+    border-color: #ffb0c8;
+    animation: reelShake 0.08s infinite;
+  }
+  .reel.win {
+    background: #fff5b0;
+    border-color: #ffb000;
+    box-shadow: 0 0 10px #ffd54a, inset 0 0 6px rgba(255, 200, 50, 0.5);
+  }
+  /* 化肥图片：默认小尺寸（与转轮字号一致），转轮内撑满 */
+  .slot-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    vertical-align: middle;
+  }
+  .slot-img-fill {
+    width: 100%;
+    height: 100%;
+  }
+  /* 野生狗奶落地后花头旁的对话框 */
+  .fert-bubble {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform-origin: right center;
+    background: #fffdf5;
+    border: 2px solid #ff8db5;
+    color: #8d4a22;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 8px 14px 10px 14px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(180, 80, 40, 0.25);
+    white-space: nowrap;
+  }
+  .fert-bubble-text {
+    border: none;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+  }
+  .fert-bubble-tail {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    margin-top: -5px;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid #ff8db5;
+  }
+  @keyframes reelShake {
+    0% { transform: translateX(-1px); }
+    50% { transform: translateX(1px); }
+    100% { transform: translateX(-1px); }
+  }
+  #slot-pull {
+    background: linear-gradient(180deg, #ff8db5 0%, #d43a6a 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 9px 0;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 3px 8px rgba(255, 100, 150, 0.4), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: transform 0.08s, box-shadow 0.08s;
+    letter-spacing: 1px;
+  }
+  #slot-pull:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(255, 100, 150, 0.5);
+  }
+  #slot-pull:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(255, 100, 150, 0.4);
+  }
+  #slot-pull:disabled {
+    background: linear-gradient(180deg, #ccc 0%, #999 100%);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .slot-status {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    min-height: 14px;
+    line-height: 14px;
+    transition: color 0.2s;
+  }
+  .slot-status.has {
+    color: #ff6f00;             /* 有免费次数时金色强调 */
+    font-weight: 700;
+    text-shadow: 0 0 6px rgba(255, 150, 0, 0.5);
+  }
+  .slot-status.pop {
+    animation: freePop 0.5s ease;
+  }
+  .slot-status.win {
+    color: #d43a6a;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 20px;
+  }
+  @keyframes freePop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35); color: #ff3d00; }
+    100% { transform: scale(1); }
+  }
+
+  /* === 游戏结束遮罩 === */
+  #gameover {
+    position: fixed;
+    inset: 0;
+    background: rgba(40, 10, 25, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  .go-card {
+    background: linear-gradient(180deg, #fff5fb 0%, #ffe0ec 100%);
+    border: 3px solid #ff8db5;
+    border-radius: 24px;
+    padding: 32px 48px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  }
+  .go-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #d43a6a;
+    margin-bottom: 8px;
+  }
+  .go-stats {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  .go-stats b { color: #d43a6a; }
+  .go-grade {
+    font-size: 74px;
+    line-height: 1.05;
+    font-weight: 900;
+    letter-spacing: 4px;
+    margin: 6px 0 8px;
+    background: linear-gradient(180deg, #ffd76e 0%, #ff9f1a 55%, #ff6a00 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 22px rgba(255, 150, 0, 0.4);
+    filter: drop-shadow(0 2px 6px rgba(200, 90, 0, 0.35));
+  }
+  .go-stat-sub {
+    font-size: 15px;
+    color: #b26a00;
+    margin-bottom: 14px;
+  }
+  .go-stat-sub b { font-size: 20px; font-weight: 800; color: #e88400; }
+  #go-restart {
+    background: linear-gradient(180deg, #ff8db5 0%, #d43a6a 100%);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 40px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 100, 150, 0.45);
+    transition: transform 0.1s;
+    letter-spacing: 2px;
+  }
+  #go-restart:hover { transform: translateY(-2px); }
+  #go-restart:active { transform: translateY(1px); }
+
+  /* === 开局弹窗：您即将乘坐黄鹤楼电梯 === */
+  #intro-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;   /* 周围背景透明，露出游戏画面 */
+    pointer-events: none;      /* 透明区域不拦截点击 */
+  }
+  .intro-card { pointer-events: auto; }
+  .intro-card {
+    background: linear-gradient(160deg, #fff3d6, #ffdda6);
+    color: #6b3d0f;
+    border: 4px solid #d29a45;
+    border-radius: 24px;
+    padding: 34px 48px 30px;
+    text-align: center;
+    box-shadow: 0 14px 48px rgba(0, 0, 0, 0.5);
+    animation: introPop 0.5s ease-out;
+  }
+  @keyframes introPop {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .intro-emoji { font-size: 60px; line-height: 1; }
+  .intro-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin: 14px 0 22px;
+    color: #8a4b12;
+    text-shadow: 0 1px 0 #fff;
+    white-space: nowrap;
+  }
+  #intro-start {
+    cursor: pointer;
+    background: linear-gradient(180deg, #e0a13d, #b27622);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 34px;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    transition: transform 0.15s;
+  }
+  #intro-start:hover  { transform: scale(1.06); }
+  #intro-start:active { transform: scale(0.97); }

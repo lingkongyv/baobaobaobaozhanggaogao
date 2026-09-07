@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>苞苞抱抱长高高</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="intro-modal">
+  <div class="intro-card">
+    <div class="intro-emoji">🏯</div>
+    <div class="intro-title">您即将乘坐黄鹤楼电梯</div>
+    <button id="intro-start">开始上升</button>
+  </div>
+</div>
+
+<div class="hud">
+  <div class="title">苞苞抱抱长高高</div>
+  <div class="stats">
+    <span>高度: <b id="hud-height">0</b></span>
+    <span>花瓣: <b id="hud-petals">0</b></span>
+    <span>阳光: <b id="hud-sun">0</b></span>
+  </div>
+</div>
+
+<div class="bottom-ui">
+  <div id="slot-machine">
+    <div class="slot-title">🎰 老虎机</div>
+    <div class="slot-row">
+      <div class="slot-frame">
+        <div class="reel" data-idx="0"><img class="slot-img slot-img-fill" src="photo/花朵.png"></div>
+        <div class="reel" data-idx="1"><img class="slot-img slot-img-fill" src="photo/花朵.png"></div>
+        <div class="reel" data-idx="2"><img class="slot-img slot-img-fill" src="photo/花朵.png"></div>
+      </div>
+      <button id="slot-pull">⌨️ 空格抽奖</button>
+    </div>
+    <div class="slot-status" id="slot-status"></div>
+  </div>
+  <div class="tip"><span>按住鼠标左键拖动花朵</span><span>按空格键自动抽奖</span></div>
+</div>
+
+<div id="gameover">
+  <div class="go-card">
+    <div class="go-title" id="go-title">花瓣全部掉光了</div>
+    <div class="go-grade" id="go-grade" style="display:none">S</div>
+    <div class="go-stat-sub" id="go-stat-sub" style="display:none">综合评分 <b id="go-score">0</b></div>
+    <div class="go-stats">
+      最终高度: <b id="final-height">0</b>
+    </div>
+    <button id="go-restart">重新开始</button>
+  </div>
+</div>
+
+<div id="weather-banner"></div>
+<div id="evolve-banner"></div>
+<div id="ach-banner"></div>
+
+<button id="ach-btn">🏆</button>
+<div id="ach-panel">
+  <div class="panel-title"><span>🏆 成就列表</span><span class="ach-act"><span id="ach-clear">清空</span><span id="ach-close">✕</span></span></div>
+  <div id="ach-list"></div>
+</div>
+
+<button id="bgm-btn" style="display:none">🎵</button>
+
+<button id="settings-btn">⚙️</button>
+<button id="nightmare-btn">🔥 噩梦</button>
+<div id="settings-panel">
+  <div class="panel-title">⚙️ 设置</div>
+  <div class="set-row"><span>暂停游戏</span><button id="set-pause" class="s-btn">暂停</button></div>
+  <div class="set-row"><span>音乐开关</span><button id="set-bgm" class="s-btn">开</button></div>
+  <div class="set-row"><span>音量</span><input id="set-vol" type="range" min="0" max="100" value="50"></div>
+  <button id="set-restart" class="s-btn row-btn">重新开始</button>
+  <button id="set-quit" class="s-btn danger row-btn">退出游戏</button>
+</div>
+
+<div id="pause-msg">⏸ 已暂停</div>
+
+<script src="js/core.js"></script>
+<script src="js/state.js"></script>
+<script src="js/achievements.js"></script>
+<script src="js/slot.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/background.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/particles-ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
