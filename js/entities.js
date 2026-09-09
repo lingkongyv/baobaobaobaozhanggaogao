@@ -313,6 +313,9 @@
       a.y = ay; a.baseY = ay;
       a.vx = dir * (state.nightmare ? rand(480, 660) : rand(400, 560));  // 大飞机：更快
       a.size = 80; a.ampl = 12; a.speed = 1.0;
+      // 贴合绘制外观的椭圆碰撞轴（机头≈41px、尾翼≈36px、主翼上≈26px、滑橇下≈23px）
+      a.hx = 46;   // 横向碰撞半轴
+      a.hy = 30;   // 纵向碰撞半轴
     } else if (type === 'kang') {   // 袋鼠宇航员：缓慢横穿 + 上下漂浮，随机一帧贴图
       let ky = state.headY + rand(-340, -90);
       ky = Math.max(state.cameraY + 40, Math.min(state.baseY - 30, ky));
@@ -380,11 +383,12 @@
       // 垂直边界
       a.y = Math.max(state.cameraY, Math.min(state.baseY - 30, a.y));
 
-      // 碰撞：所有飞船（含直线掠过的）碰到花都会造成伤害
+      // 碰撞：椭圆判定（默认圆形=两半轴取 size；大飞机已改为贴合外观的 hx/hy）
       const dx = a.x - state.headX;
       const dy = a.y - state.headY;
-      const rr = a.size + headR;
-      if (state.hitCooldown <= 0 && !plantHidden() && dx * dx + dy * dy <= rr * rr) {
+      const hx = (a.hx || a.size) + headR;   // 外扩花半径
+      const hy = (a.hy || a.size) + headR;
+      if (state.hitCooldown <= 0 && !plantHidden() && (dx * dx) / (hx * hx) + (dy * dy) / (hy * hy) <= 1) {
         a.remove = true;
         if (a.type === 'kang') {
           // 袋鼠：扣 1 瓣 + 花头旁弹话 + 播放音效
@@ -638,6 +642,8 @@
     document.getElementById('go-title').textContent = '花瓣全部掉光了';
     document.getElementById('go-grade').style.display = 'none'; // 死亡不显示评级
     document.getElementById('go-stat-sub').style.display = 'none'; // 死亡不显示评分
+    document.getElementById('go-stat-petals').style.display = 'none'; // 死亡不显示花瓣
+    document.getElementById('go-stat-time').style.display = 'none'; // 死亡不显示用时
     document.getElementById('final-height').textContent = Math.max(0, Math.floor(state.maxHeight / 10));
     document.getElementById('gameover').style.display = 'flex';
   }
@@ -662,6 +668,13 @@
     document.getElementById('go-score').textContent = score;
     document.getElementById('go-grade').style.display = 'block';
     document.getElementById('go-stat-sub').style.display = 'block';
+    // 展示评级依据：剩余花瓣 + 通关用时
+    const t = Math.max(0, Math.floor(state.playTime));
+    const mt = Math.floor(t / 60), st = t % 60;
+    document.getElementById('go-petals').textContent = state.petals;
+    document.getElementById('go-time').textContent = mt + '分' + String(st).padStart(2, '0') + '秒';
+    document.getElementById('go-stat-petals').style.display = 'block';
+    document.getElementById('go-stat-time').style.display = 'block';
     document.getElementById('final-height').textContent = Math.max(0, Math.floor(state.maxHeight / 10));
     document.getElementById('gameover').style.display = 'flex';
     emitParticles(state.headX, state.headY, '#ffd76e', 50);

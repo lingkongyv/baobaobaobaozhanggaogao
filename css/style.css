@@ -749,10 +749,17 @@
     margin-bottom: 8px;
   }
   .go-stats {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 18px;
     font-size: 15px;
     color: #666;
     margin-bottom: 20px;
   }
+  .go-stat-row { white-space: nowrap; }
   .go-stats b { color: #d43a6a; }
   .go-grade {
     font-size: 74px;

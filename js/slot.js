@@ -911,6 +911,8 @@
     e.preventDefault(); // 阻止空格滚动页面
     pullSlot();
   });
+  // 鼠标点击抽奖按钮：与空格等效，均可触发抽奖
+  slotPullBtn.addEventListener('click', () => pullSlot());
   // 阻止老虎机区域的鼠标事件冒泡到画布，避免与拖拽冲突
   document.getElementById('slot-machine').addEventListener('mousedown', e => e.stopPropagation());
   document.getElementById('slot-machine').addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
