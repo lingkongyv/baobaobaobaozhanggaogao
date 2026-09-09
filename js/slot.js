@@ -386,7 +386,7 @@
   const FREE_SPIN_CAP = 3;
   const FREE_SPIN_METERS = 100;
   const FREE_SPIN_TIME = 30;
-  const FREE_AUTO_SPIN_TIME = 15; // 有免费次数却闲置超过 15 秒：自动抽一次
+  const FREE_AUTO_SPIN_TIME = 8; // 有免费次数却闲置超过 8 秒：自动抽一次
 
   // 状态行常驻提示（无动态消息时显示关键规则）
   const SLOT_HINT = '☀️3抽1次 · 每100米/30秒送🎁';
