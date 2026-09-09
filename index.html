@@ -20,9 +20,9 @@
 <div class="hud">
   <div class="title">苞苞抱抱长高高</div>
   <div class="stats">
-    <span>高度: <b id="hud-height">0</b></span>
-    <span>花瓣: <b id="hud-petals">0</b></span>
-    <span>阳光: <b id="hud-sun">0</b></span>
+    <div class="stat"><span class="s-label">🏔️ 高度</span><b id="hud-height">0</b></div>
+    <div class="stat"><span class="s-label">花瓣</span><b id="hud-petals">0</b></div>
+    <div class="stat"><span class="s-label">阳光</span><b id="hud-sun">0</b></div>
   </div>
 </div>
 
@@ -58,6 +58,27 @@
 <div id="evolve-banner"></div>
 <div id="ach-banner"></div>
 
+<!-- 教学提示面板：默认隐藏；20~80 米窗口出现在屏幕左/右两侧，点“我知道了”关闭 -->
+<div id="phase-tip">
+  <video id="phase-video" src="video/教程1.mp4" autoplay muted loop playsinline preload="auto"></video>
+  <div class="tip-txt">
+    <p>左键放在花朵上拖拽移动躲避飞行物。</p>
+    <p>花瓣<span class="tip-petal"></span>全部掉落则游戏结束!</p>
+    <p>记得空格抽奖获得强力道具!</p>
+  </div>
+  <button id="phase-ok" class="tip-btn">我知道了</button>
+</div>
+<!-- 右侧教学提示面板（教程2：道具刷新说明） -->
+<div id="phase-tip-r">
+  <video id="phase-video-r" src="video/教程2.mp4" autoplay muted loop playsinline preload="auto"></video>
+  <div class="tip-txt">
+    <p>途中还有随机的道具刷新</p>
+    <p>捡起花瓣<span class="tip-petal"></span>可以回复血量</p>
+    <p>捡起阳光<span class="tip-sun"></span>可以获得抽奖次数</p>
+  </div>
+  <button id="phase-ok-r" class="tip-btn">我知道了</button>
+</div>
+
 <button id="ach-btn">🏆</button>
 <div id="ach-panel">
   <div class="panel-title"><span>🏆 成就列表</span><span class="ach-act"><span id="ach-clear">清空</span><span id="ach-close">✕</span></span></div>
@@ -67,7 +88,14 @@
 <button id="bgm-btn" style="display:none">🎵</button>
 
 <button id="settings-btn">⚙️</button>
-<button id="nightmare-btn">🔥 噩梦</button>
+<button id="nightmare-btn">噩梦</button>
+<button id="prop-toggle">查看道具效果</button>
+<div id="prop-panel">
+  <div class="prop-row"><img class="prop-ic" src="photo/花朵.png" alt="花朵"><div class="prop-tx"><b>花朵</b><span>花瓣 ×2,满天花雨</span></div></div>
+  <div class="prop-row"><img class="prop-ic" src="photo/野生狗奶.png" alt="野生狗奶"><div class="prop-tx"><b>野生狗奶</b><span>+1 花瓣,花朵变大</span></div></div>
+  <div class="prop-row"><img class="prop-ic" src="photo/金坷垃.png" alt="金坷垃"><div class="prop-tx"><b>金坷垃</b><span>+1 花瓣,快速生长（越高越猛）</span></div></div>
+  <div class="prop-row"><img class="prop-ic" src="photo/神秘道具.png" alt="名刀司命"><div class="prop-tx"><b>名刀司命</b><span>死亡时保住两朵花瓣</span></div></div>
+</div>
 <div id="settings-panel">
   <div class="panel-title">⚙️ 设置</div>
   <div class="set-row"><span>暂停游戏</span><button id="set-pause" class="s-btn">暂停</button></div>

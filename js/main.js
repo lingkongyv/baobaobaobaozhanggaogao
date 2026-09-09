@@ -41,6 +41,8 @@
       if (state.hitCooldown > 0) state.hitCooldown -= dt;
     }
 
+    updatePhaseTip();  // 教学提示面板：20~80 米窗口自动显隐
+
     // 渲染
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = skyGradient();

@@ -724,6 +724,8 @@
     state.windGrowHeight = 0;
     state.lastWindH = 0;
     state.maxHeight = 0;
+    state.tipClosedL = false;    // 教学面板：新开一局后 20~80 米可再次弹出（左侧）
+    state.tipClosedR = false;    // 教学面板：新开一局后 20~80 米可再次弹出（右侧）
     state.cameraX = 0;
     state.cameraY = 0;
     state.velocityX = 0;

@@ -270,8 +270,8 @@
     const heightPx = state.baseY - state.headY;
     if (heightPx > state.maxHeight) state.maxHeight = heightPx;
 
-    // 到达 3500 米：触发胜利评级结束（S / SSS / SSS）
-    if (state.maxHeight >= 35000 && !state.gameOver) triggerWin();
+    // 到达 4000 米：触发胜利评级结束（S / SSS / SSS）
+    if (state.maxHeight >= 40000 && !state.gameOver) triggerWin();
 
     // 到达 20 米 / 80 米：各播放一次黄鹤楼语音
     if (!state.annElevator && state.maxHeight >= 200) {

@@ -627,8 +627,8 @@
         showStrongBubble(pick.text);          // 弹出对应文案
       });
     } else if (symbol === '🌸') {
-      // 花朵(🌸)：+3 花瓣（上限 16）＋满天花雨＋音效
-      state.petals = Math.min(state.petalCap, state.petals + 3);
+      // 花朵(🌸)：花瓣 ×2（上限 petalCap）＋满天花雨＋音效
+      state.petals = Math.min(state.petalCap, state.petals * 2);
       emitParticles(state.headX, state.headY, '#ff6fa3', 28);
       flowerRain();                                        // 满天花雨
       showStrongBubble('花开又花谢花满天');                // 弹出文案

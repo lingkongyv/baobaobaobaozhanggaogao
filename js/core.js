@@ -37,6 +37,19 @@
   };
   document.addEventListener('pointerdown', startBgmOnce);
 
+  // 左/右教学面板视频：循环播放（静音自动播放通常放行，兜底：首次交互后再确保播放）
+  const phaseVideos = [document.getElementById('phase-video'), document.getElementById('phase-video-r')]
+    .filter(Boolean);
+  for (const v of phaseVideos) v.muted = true;
+  const ensurePhaseVideo = () => {
+    for (const v of phaseVideos) {
+      const p = v.play();
+      if (p) p.catch(() => {});
+    }
+  };
+  ensurePhaseVideo();
+  document.addEventListener('pointerdown', ensurePhaseVideo, { once: true });
+
   // === 右上角设置 ===
   const settingsBtn = document.getElementById('settings-btn');
   const settingsPanel = document.getElementById('settings-panel');
@@ -107,6 +120,51 @@
     refreshPause();
     refreshNightmareBtn();
   });
+  // 查看道具效果：点击展开 / 再点击收缩
+  const propToggle = document.getElementById('prop-toggle');
+  const propPanel = document.getElementById('prop-panel');
+  propToggle.addEventListener('click', () => {
+    propPanel.classList.toggle('open');
+  });
+
+  // === 教学提示面板（屏幕左、右各一块）===
+  // 显示窗口：开局后到达 20~80 米（plantHidden 区间）两面板同时出现，超过 80 米自动隐藏；
+  // 各自“我知道了”只关闭自己的那块（另一块不受影响），本局内不再自动弹回，重开一局后再次生效。
+  const phaseSide = (elId, okId, vidId, flag) => {
+    const el = document.getElementById(elId);
+    if (!el) return null;
+    const ok = document.getElementById(okId);
+    if (ok) ok.addEventListener('click', () => {
+      state[flag] = true;                       // 该侧本局内不再自动弹出
+      el.classList.remove('show');
+      const v = document.getElementById(vidId);
+      if (v && !v.paused) v.pause();
+    });
+    return {
+      el,
+      vid: document.getElementById(vidId),
+      flag,
+      prevShown: false,                         // 上次是否显示（窗口刚进入时从头播放）
+    };
+  };
+  const phaseSides = [
+    phaseSide('phase-tip', 'phase-ok', 'phase-video', 'tipClosedL'),
+    phaseSide('phase-tip-r', 'phase-ok-r', 'phase-video-r', 'tipClosedR'),
+  ].filter(Boolean);
+
+  function updatePhaseTip() {
+    const inWindow = !!(state && state.started && !state.paused && !state.gameOver && plantHidden());
+    for (const s of phaseSides) {
+      const shouldShow = inWindow && !state[s.flag];
+      if (shouldShow && !s.prevShown && s.vid) s.vid.currentTime = 0;  // 进入窗口重头播
+      s.el.classList.toggle('show', !!shouldShow);
+      if (s.vid) {
+        if (shouldShow) { const p = s.vid.play(); if (p) p.catch(() => {}); }
+        else if (!s.vid.paused) s.vid.pause();
+      }
+      s.prevShown = shouldShow;
+    }
+  }
   document.getElementById('set-quit').addEventListener('click', () => {
     try { window.close(); } catch (e) {}
     // 浏览器通常禁止脚本关闭非脚本打开的标签页，兜底提示

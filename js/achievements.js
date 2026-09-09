@@ -64,7 +64,7 @@
     { id: 'dist1600',  icon: '☄️', name: '流星区入口', desc: '升至 1600 米，陨石雨将至', ok: s => s.maxHeight >= 16000 },
     { id: 'dist2000',  icon: '🦘', name: '袋鼠出没', desc: '升至 2000 米，袋鼠宇航员现身', ok: s => s.maxHeight >= 20000 },
     { id: 'dist3000',  icon: '🛸', name: '飞碟追击', desc: '升至 3000 米，宇宙飞船登场', ok: s => s.maxHeight >= 30000 },
-    { id: 'dist3500',  icon: '🏔️', name: '登顶天梯', desc: '升至 3500 米通关',       ok: s => s.maxHeight >= 35000 },
+    { id: 'dist4000',  icon: '🏔️', name: '登顶天梯', desc: '升至 4000 米通关',       ok: s => s.maxHeight >= 40000 },
 
     // ── 进化 · 花朵形态 ──
     { id: 'evolve1',   icon: '🔥', name: '凤凰初绽', desc: '进化成凤凰花（500 米）', ok: s => s.evolveIndex >= 0 },
