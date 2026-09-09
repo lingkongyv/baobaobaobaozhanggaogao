@@ -349,10 +349,10 @@
     z-index: 30;
     border: 2px solid rgba(255, 255, 255, 0.55);
     border-radius: 999px;
-    padding: 6px 12px;
+    padding: 8px 16px;
     background: linear-gradient(135deg, #ffd98a, #ffb45c);
     color: #7a4a12;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: 1px;
     white-space: nowrap;
@@ -366,7 +366,7 @@
   #prop-panel {
     position: fixed;
     right: 48px;   /* 与按钮同列，面板向左侧展开 */
-    top: 156px;    /* 紧贴"查看道具效果"按钮正下方 */
+    top: 164px;    /* 紧贴放大后的"查看道具效果"按钮正下方 */
     z-index: 30;
     width: 280px;
     background: linear-gradient(160deg, #fff3e0, #ffe4c4);

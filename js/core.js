@@ -153,7 +153,8 @@
   ].filter(Boolean);
 
   function updatePhaseTip() {
-    const inWindow = !!(state && state.started && !state.paused && !state.gameOver && plantHidden());
+    // 暂停时（设置里的暂停）面板保持不消失；只在离开 20~80 米或点“我知道了”后隐藏
+    const inWindow = !!(state && state.started && !state.gameOver && plantHidden());
     for (const s of phaseSides) {
       const shouldShow = inWindow && !state[s.flag];
       if (shouldShow && !s.prevShown && s.vid) s.vid.currentTime = 0;  // 进入窗口重头播
